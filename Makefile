@@ -68,9 +68,9 @@ $(OBJ_DIR)/%.o: %.s
 size:
 	$(SIZE) $(BUILD_DIR)/$(TARGET).elf
 
-flash: $(BUILD_DIR)/$(TARGET).bin
+flash: $(BIN_DIR)/$(TARGET).bin
 	openocd -f interface/stlink.cfg -f target/stm32f4x.cfg \
-	  -c "program $(TARGET).bin 0x08000000 verify reset exit"
+		-c "program $(BIN_DIR)/$(TARGET).bin 0x08000000 verify reset exit"
 
 
 clean:

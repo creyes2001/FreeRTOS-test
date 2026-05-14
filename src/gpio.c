@@ -13,18 +13,18 @@ void GPIO_Init(uint8_t pin, gpio_port_e port, gpio_config_t *config)
 		case GPIO_PIN:
 			if(config->direction == GPIO_OUTPUT)
 			{
-				gpio_port[port]->MODER |= (1 << (2^pin));
+				gpio_port[port]->MODER |= (1 << (2*pin));
 			}
 			else
 			{
-				gpio_port[port]->MODER &= ~(3 << (2^pin));
+				gpio_port[port]->MODER &= ~(3 << (2*pin));
 			}
 			break;
 		case AF_PIN:
-			gpio_port[port]->MODER |= (1 << (2^pin));
+			gpio_port[port]->MODER |= (1 << (2*pin));
 			break;
 		case ANALOG_PIN:
-			gpio_port[port]->MODER |= (3 << (2^pin));
+			gpio_port[port]->MODER |= (3 << (2*pin));
 			break;
 		default:
 			break;
@@ -42,13 +42,13 @@ void GPIO_Init(uint8_t pin, gpio_port_e port, gpio_config_t *config)
 
 	switch(config->resistor){
 		case PULL_DOWN:
-			gpio_port[port]->PUPDR |= (2 << (2^pin)); 
+			gpio_port[port]->PUPDR |= (2 << (2*pin)); 
 			break;
 		case PULL_UP:
-			gpio_port[port]->PUPDR |= (1 << (2^pin));
+			gpio_port[port]->PUPDR |= (1 << (2*pin));
 			break;
 		case DISABLE:
-			gpio_port[port]->PUPDR &= ~(3 << (2^pin));
+			gpio_port[port]->PUPDR &= ~(3 << (2*pin));
 			break;
 		default:
 			break;
@@ -56,16 +56,16 @@ void GPIO_Init(uint8_t pin, gpio_port_e port, gpio_config_t *config)
 	
 	switch(config->speed){
 		case HIGH_SPEED:
-			gpio_port[port]->OSPEEDR |= (3 << (2^pin));
+			gpio_port[port]->OSPEEDR |= (3 << (2*pin));
 			break;
 		case FAST_SPEED:
-			gpio_port[port]->OSPEEDR |= (2 << (2^pin));
+			gpio_port[port]->OSPEEDR |= (2 << (2*pin));
 			break;
 		case MEDIUM_SPEED:
-			gpio_port[port]->OSPEEDR |= (1 << (2^pin));
+			gpio_port[port]->OSPEEDR |= (1 << (2*pin));
 			break;
 		case LOW_SPEED:
-			gpio_port[port]->OSPEEDR &= ~(3 << (2^pin));
+			gpio_port[port]->OSPEEDR &= ~(3 << (2*pin));
 			break;
 		default:
 			break;
@@ -80,7 +80,7 @@ void GPIO_Write(uint8_t pin, gpio_port_e port,gpio_level_e level)
 	}
 	else
 	{
-		gpio_port[port]->BSRR = (1 << (pin + 16);
+		gpio_port[port]->BSRR = (1 << (pin + 16));
 	}
 
 }
