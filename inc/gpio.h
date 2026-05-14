@@ -7,7 +7,7 @@ typedef enum {
 	GPIO_PIN,
 	AF_PIN,
 	ANALOG_PIN
-}gpio_type_e;
+}gpio_mode_e;
 
 typedef enum {
 	GPIO_OUTPUT,
@@ -27,6 +27,7 @@ typedef enum {
 
 typedef enum {
 	HIGH_SPEED,
+	FAST_SPEED,
 	MEDIUM_SPEED,
 	LOW_SPEED
 }gpio_speed_e;
@@ -36,16 +37,25 @@ typedef enum {
 	GPIO_LOW
 }gpio_level_e;
 
+//Only for the stm32f446 in LQFP64 MCU 
+typedef enum {
+	PORTA,
+	PORTB,
+	PORTC,
+	PORTD,
+	PORTH
+}gpio_port_e;
+
 typedef struct {
-	gpio_type_e  type;
+	gpio_mode_e  mode;
 	gpio_direction_e direction;
 	gpio_resistor_e resistor;
 	gpio_outType_e outType;
 	gpio_speed_e speed;
 }gpio_config_t;
 
-void GPIO_Init(uint8_t PIN, gpio_config_t *config);
-void GPIO_Write(uint8_t PIN,gpio_level_e level);
-gpio_level_e GPIO_READ(uint8_t PIN);
+void GPIO_Init(uint8_t pin, gpio_port_e port, gpio_config_t *config);
+void GPIO_Write(uint8_t pin, gpio_port_e port,gpio_level_e level);
+gpio_level_e GPIO_READ(uint8_t pin, gpio_port_e port);
 
 #endif //GPIO_H
