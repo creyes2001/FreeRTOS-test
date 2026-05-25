@@ -2,6 +2,7 @@
 #include "gpio.h"
 #include "FreeRTOS.h"
 #include "task.h"
+#include "clock.h"
 
 void SystemInit(void) {}
 
@@ -35,19 +36,12 @@ void blink_task(void *p) {
 
 int main(void)
 {
+	SysClk_Config();
 	RCC->AHB1ENR |= (1 << 0);   // GPIOAEN
 	GPIO_Init(5,PORTA,&led);
-	//GPIO_Init(6,PORTA,&push_button);
 
  	xTaskCreate(blink_task, "blink", 128, NULL, 1, NULL);
     vTaskStartScheduler();
     for(;;);  // should never reach here
 
-    /*while (1)
-	{
-		if(GPIO_READ(6,PORTA) == GPIO_HIGH){
-			GPIO_Write(5,PORTA,GPIO_HIGH);
-		}
-		GPIO_Write(5,PORTA,GPIO_LOW);
-	}*/
 }

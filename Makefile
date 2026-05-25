@@ -28,6 +28,7 @@ TARGET  = FreeTest
 
 SOURCES = main.c\
 		  src/gpio.c\
+		  src/clock.c\
 		  $(FREERTOS_DIR)/tasks.c \
 		  $(FREERTOS_DIR)/queue.c \
 		  $(FREERTOS_DIR)/list.c \
