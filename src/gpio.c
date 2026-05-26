@@ -1,4 +1,4 @@
-#include "gpio.h"
+#include "gpio.h"	
 #include "stm32f446xx.h"
 
 //Using the GPIO_Typedef declaration from the CMSIS header 
@@ -22,6 +22,15 @@ void GPIO_Init(uint8_t pin, gpio_port_e port, gpio_config_t *config)
 			break;
 		case AF_PIN:
 			gpio_port[port]->MODER |= (1 << (2*pin));
+
+			if(pin <= 7){
+				gpio_port[port]->AFR[0] &= ~((uint32_t)0xF << (pin*4));			  //Clear the bit field 
+				gpio_port[port]->AFR[0] |= ((uint32_t)config->alt_func << (pin*4)); 
+			}
+			else{
+				gpio_port[port]->AFR[1] &= ~((uint32_t)0xF << ((pin - 8)*4));			  //Clear the bit field 
+				gpio_port[port]->AFR[1] |= ((uint32_t)config->alt_func << ((pin - 8)*4)); 
+			}
 			break;
 		case ANALOG_PIN:
 			gpio_port[port]->MODER |= (3 << (2*pin));
@@ -47,7 +56,7 @@ void GPIO_Init(uint8_t pin, gpio_port_e port, gpio_config_t *config)
 		case PULL_UP:
 			gpio_port[port]->PUPDR |= (1 << (2*pin));
 			break;
-		case DISABLE:
+		case RESISTOR_DISABLE:
 			gpio_port[port]->PUPDR &= ~(3 << (2*pin));
 			break;
 		default:
@@ -69,7 +78,9 @@ void GPIO_Init(uint8_t pin, gpio_port_e port, gpio_config_t *config)
 			break;
 		default:
 			break;
-	}	
+	}
+
+	 
 }
 
 void GPIO_Write(uint8_t pin, gpio_port_e port,gpio_level_e level)

@@ -29,8 +29,19 @@ gpio_config_t push_button = {
 
 void blink_task(void *p) {
     for(;;) {
-        GPIOA->ODR ^= (1 << 5);
-        vTaskDelay(pdMS_TO_TICKS(500));
+		GPIO_Write(5,PORTA,GPIO_HIGH);
+        vTaskDelay(pdMS_TO_TICKS(300));
+		GPIO_Write(5,PORTA,GPIO_LOW);
+        vTaskDelay(pdMS_TO_TICKS(300));
+    }
+}
+
+void blink_task1(void *p) {
+    for(;;) {
+		GPIO_Write(5,PORTA,GPIO_HIGH);
+        vTaskDelay(pdMS_TO_TICKS(1000));
+		GPIO_Write(5,PORTA,GPIO_LOW);
+        vTaskDelay(pdMS_TO_TICKS(1000));
     }
 }
 
@@ -41,6 +52,7 @@ int main(void)
 	GPIO_Init(5,PORTA,&led);
 
  	xTaskCreate(blink_task, "blink", 128, NULL, 1, NULL);
+ 	xTaskCreate(blink_task1, "blink1", 128, NULL, 1, NULL);
     vTaskStartScheduler();
     for(;;);  // should never reach here
 
