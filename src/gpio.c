@@ -7,7 +7,7 @@ GPIO_TypeDef * const gpio_port[] = {GPIOA,GPIOB,GPIOC,GPIOD,GPIOH};
 void GPIO_Init(uint8_t pin, gpio_port_e port, gpio_config_t *config)
 {
 
-	gpio_port[port]->MODER &= ~(3 << (2^pin));//Clear bits before configuration
+	gpio_port[port]->MODER &= ~(3 << (2*pin));//Clear bits before configuration
 
 	switch(config->mode){
 		case GPIO_PIN:
@@ -21,7 +21,7 @@ void GPIO_Init(uint8_t pin, gpio_port_e port, gpio_config_t *config)
 			}
 			break;
 		case AF_PIN:
-			gpio_port[port]->MODER |= (1 << (2*pin));
+			gpio_port[port]->MODER |= (2 << (2*pin));
 
 			if(pin <= 7){
 				gpio_port[port]->AFR[0] &= ~((uint32_t)0xF << (pin*4));			  //Clear the bit field 
