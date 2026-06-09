@@ -60,6 +60,12 @@ gpio_config_t uart4_tx = {
 	.alt_func = AF8
 };
 
+gpio_config_t uart4_rx = {
+	.mode = AF_PIN,
+	.speed = HIGH_SPEED,
+	.alt_func = AF8
+};
+
 /*void blink_task(void *p) {
     for(;;) {
 		GPIO_Write(5,PORTA,GPIO_HIGH);
@@ -91,15 +97,9 @@ int main(void)
 	(void)RCC->APB1ENR;			// dummy read
 
 	GPIO_Init(5,PORTA,&led);
-//	GPIO_Init(0,PORTA,&uart4_tx);
+	GPIO_Init(0,PORTA,&uart4_tx);
+	GPIO_Init(1,PORTA,&uart4_rx);
 
-	GPIOA->MODER &= ~((3U << (0*2)) | (3U << (1*2)));
-GPIOA->MODER |=  ((2U << (0*2)) | (2U << (1*2)));
-GPIOA->AFR[0] &= ~((0xFU << (0*4)) | (0xFU << (1*4)));
-GPIOA->AFR[0] |=  ((8U   << (0*4)) | (8U   << (1*4)));
-GPIOA->OSPEEDR |= ((3U << (0*2)) | (3U << (1*2)));
-GPIOA->PUPDR   &= ~((3U << (0*2)) | (3U << (1*2)));
-	
 Uart_Init();
  	/*xTaskCreate(blink_task, "blink", 128, NULL, 1, NULL);
  	xTaskCreate(blink_task1, "blink1", 128, NULL, 1, NULL);
@@ -109,12 +109,13 @@ Uart_Init();
 	while(1)
 	{
 		
-		Uart_Tx(0x55);
-		delay_ms(500);
-	
-	/*	GPIO_Write(5,PORTA,GPIO_HIGH);
-		delay_ms(10000);
+		//Uart_Tx(0x56);
+		//delay_ms(500);
+	if(Uart_Rx() == 0x55)
+		GPIO_Write(5,PORTA,GPIO_HIGH);
+		//delay_ms(10000);
+	else if(Uart_Rx() == 0x56)
 		GPIO_Write(5,PORTA,GPIO_LOW);
-		delay_ms(10000);*/
+		//delay_ms(10000);*/
 	}
 }

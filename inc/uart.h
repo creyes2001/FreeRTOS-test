@@ -6,5 +6,6 @@
 
 void Uart_Init(void);
 void Uart_Tx(uint8_t data);
+uint8_t Uart_Rx(void);
 
 #endif //UART_H
