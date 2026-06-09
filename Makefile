@@ -14,8 +14,8 @@ BIN_DIR = $(BUILD_DIR)/bin
 
 INCLUDE_DIRS = $(STM_INCLUDE_DIR)\
 			   ./inc\
-			   $(FREERTOS_DIR)/include \
-			   $(FREERTOS_PORT)
+			 #  $(FREERTOS_DIR)/include \
+			 #  $(FREERTOS_PORT)
 
 #=====================TOOLCHAIN=================================
 CC = arm-none-eabi-gcc
@@ -29,13 +29,14 @@ TARGET  = FreeTest
 SOURCES = main.c\
 		  src/gpio.c\
 		  src/clock.c\
-		  $(FREERTOS_DIR)/tasks.c \
-		  $(FREERTOS_DIR)/queue.c \
-		  $(FREERTOS_DIR)/list.c \
-		  $(FREERTOS_DIR)/timers.c \
-		  $(FREERTOS_DIR)/event_groups.c \
-		  $(FREERTOS_PORT)/port.c \
-		  $(FREERTOS_HEAP)/heap_4.c
+		  src/uart.c\
+		 # $(FREERTOS_DIR)/tasks.c \
+		 # $(FREERTOS_DIR)/queue.c \
+		 # $(FREERTOS_DIR)/list.c \
+		 # $(FREERTOS_DIR)/timers.c \
+		 # $(FREERTOS_DIR)/event_groups.c \
+		 # $(FREERTOS_PORT)/port.c \
+		 # $(FREERTOS_HEAP)/heap_4.c
 
 ASM_SRCS = $(STM_STARTUP_DIR)/startup_stm32f446xx.s
 
