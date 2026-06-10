@@ -24,7 +24,10 @@ void delay_ms(uint32_t ms) {
     while ((ms_ticks - start) < ms);
 }
 
-
+void UART4_IRQHandler(void)
+{
+	Uart_InterruptHandler();
+}
 /*void vApplicationStackOverflowHook(TaskHandle_t xTask, char *pcTaskName)
 {
     (void)xTask; (void)pcTaskName;
@@ -110,7 +113,6 @@ Uart_Init();
 	{
 		
 		Uart_Tx(0x56);
-		delay_ms(500);
 
 		GPIO_Write(5,PORTA,GPIO_HIGH);
 		delay_ms(500);

@@ -1,6 +1,9 @@
 #include "buffer.h"
 #include "uart.h"
 
+static buffer_t tx_buffer;
+static buffer_t rx_buffer;
+
 void Uart_Init(void){
 	
 	UART4->CR1 = 0;
@@ -13,12 +16,30 @@ void Uart_Init(void){
 	UART4->CR1 |= (1U << 2); //Receiver enable (RE)
 	UART4->CR1 |= (1U << 13); //Uart peripherial enable (UE)
 
+	NVIC_EnableIRQ(UART4_IRQn);
 	UART4->CR1 |= (1U << 7); //TXEIE enabled
+	
+	Buffer_Init(&tx_buffer);
+	Buffer_Init(&rx_buffer);
+}
+
+void Uart_InterruptHandler(void){
+	//tx handling
+	if (UART4->SR & (1U << 7)) { 
+		uint8_t c;
+		if(Buffer_Get(&tx_buffer,&c))
+		{
+			UART4->DR = c;
+		}
+		else {
+			UART4->CR1 &= ~(1U << 7);
+		}
+	}
 }
 
 void Uart_Tx(uint8_t data){
-	while (!(UART4->SR & (1U << 7)));
-	UART4->DR = data;
+	(void)Buffer_Add(&tx_buffer,data);
+ 	UART4->CR1 |= (1U << 7); //TXEIE enabled
 }
 
 uint8_t Uart_Rx(void){
