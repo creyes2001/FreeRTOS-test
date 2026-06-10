@@ -74,6 +74,8 @@ FreeTest/
 
 ## FreeRTOS — Next Step
 
+> The repository is named after this integration target — FreeRTOS is not yet in the codebase.
+
 Once UART4 RX is complete, the project transitions to FreeRTOS integration:
 
 - Port: `ARM_CM4F` (hardware FPU support)
