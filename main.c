@@ -108,16 +108,24 @@ Uart_Init();
  	xTaskCreate(blink_task1, "blink1", 128, NULL, 1, NULL);
     vTaskStartScheduler();
     for(;;);  // should never reach here*/
-
+uint8_t c;
 	while(1)
 	{
 		
 		Uart_Tx(0x56);
 
+if(Uart_Rx(&c))
+{
+	if(c==0x56)
+	{
 		GPIO_Write(5,PORTA,GPIO_HIGH);
-		delay_ms(500);
+	//	delay_ms(500);
+		
+	}
+	else{
 		GPIO_Write(5,PORTA,GPIO_LOW);
-		delay_ms(500);
+	}//	delay_ms(500);
+}
 /*	if(Uart_Rx() == 0x55)
 		GPIO_Write(5,PORTA,GPIO_HIGH);
 		//delay_ms(10000);

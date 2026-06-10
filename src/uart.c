@@ -18,14 +18,15 @@ void Uart_Init(void){
 
 	NVIC_EnableIRQ(UART4_IRQn);
 	UART4->CR1 |= (1U << 7); //TXEIE enabled
-	
+	UART4->CR1 |= (1U << 5); //RXEIE enabled
+
 	Buffer_Init(&tx_buffer);
 	Buffer_Init(&rx_buffer);
 }
 
 void Uart_InterruptHandler(void){
 	//tx handling
-	if (UART4->SR & (1U << 7)) { 
+	if ((UART4->SR & (1U << 7)) && (UART4->CR1 & (1U <<7))) { 
 		uint8_t c;
 		if(Buffer_Get(&tx_buffer,&c))
 		{
@@ -35,6 +36,13 @@ void Uart_InterruptHandler(void){
 			UART4->CR1 &= ~(1U << 7);
 		}
 	}
+
+	//rx handling
+	if(UART4->SR & (1U << 5)){
+		uint8_t c;
+		c = UART4->DR;
+		Buffer_Add(&rx_buffer,c);
+	}
 }
 
 void Uart_Tx(uint8_t data){
@@ -42,11 +50,6 @@ void Uart_Tx(uint8_t data){
  	UART4->CR1 |= (1U << 7); //TXEIE enabled
 }
 
-uint8_t Uart_Rx(void){
-	if(UART4->SR & (1U << 5))
-	{
-		UART4->SR &= ~(1U <<5);
-		return UART4->DR;
-	}
-	return 123;
+bool Uart_Rx(uint8_t *data){
+	return Buffer_Get(&rx_buffer,data);
 }
