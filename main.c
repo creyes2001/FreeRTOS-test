@@ -109,9 +109,14 @@ Uart_Init();
 	while(1)
 	{
 		
-		//Uart_Tx(0x56);
-		//delay_ms(500);
-	if(Uart_Rx() == 0x55)
+		Uart_Tx(0x56);
+		delay_ms(500);
+
+		GPIO_Write(5,PORTA,GPIO_HIGH);
+		delay_ms(500);
+		GPIO_Write(5,PORTA,GPIO_LOW);
+		delay_ms(500);
+/*	if(Uart_Rx() == 0x55)
 		GPIO_Write(5,PORTA,GPIO_HIGH);
 		//delay_ms(10000);
 	else if(Uart_Rx() == 0x56)

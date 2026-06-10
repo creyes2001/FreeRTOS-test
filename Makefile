@@ -30,6 +30,7 @@ SOURCES = main.c\
 		  src/gpio.c\
 		  src/clock.c\
 		  src/uart.c\
+		  src/buffer.c\
 		 # $(FREERTOS_DIR)/tasks.c \
 		 # $(FREERTOS_DIR)/queue.c \
 		 # $(FREERTOS_DIR)/list.c \

@@ -1,3 +1,4 @@
+#include "buffer.h"
 #include "uart.h"
 
 void Uart_Init(void){
@@ -12,7 +13,7 @@ void Uart_Init(void){
 	UART4->CR1 |= (1U << 2); //Receiver enable (RE)
 	UART4->CR1 |= (1U << 13); //Uart peripherial enable (UE)
 
-	
+	UART4->CR1 |= (1U << 7); //TXEIE enabled
 }
 
 void Uart_Tx(uint8_t data){
