@@ -1,7 +1,7 @@
 #include "stm32f446xx.h"
 #include "gpio.h"
-//#include "FreeRTOS.h"
-//#include "task.h"
+#include "FreeRTOS.h"
+#include "task.h"
 #include "uart.h"
 #include "clock.h"
 
@@ -28,12 +28,12 @@ void UART4_IRQHandler(void)
 {
 	Uart_InterruptHandler();
 }
-/*void vApplicationStackOverflowHook(TaskHandle_t xTask, char *pcTaskName)
+void vApplicationStackOverflowHook(TaskHandle_t xTask, char *pcTaskName)
 {
     (void)xTask; (void)pcTaskName;
     taskDISABLE_INTERRUPTS();
     for(;;);
-}*/
+}
 
 gpio_config_t led= {
 	.mode = GPIO_PIN,
@@ -50,10 +50,6 @@ gpio_config_t push_button = {
 };
 
 //UART5 pin configuration
-//PA0: UART4_TX, PA1: UART4_RX, AF8= UART4,5
-//Tx pin: push-pull, high speed, pull no needed, AF8
-//RX:pull-up,AF8  
-//TODO: implememt pins configuration
 
 gpio_config_t uart4_tx = {
 	.mode = AF_PIN,
@@ -69,7 +65,7 @@ gpio_config_t uart4_rx = {
 	.alt_func = AF8
 };
 
-/*void blink_task(void *p) {
+void blink_task(void *p) {
     for(;;) {
 		GPIO_Write(5,PORTA,GPIO_HIGH);
         vTaskDelay(pdMS_TO_TICKS(300));
@@ -85,7 +81,7 @@ void blink_task1(void *p) {
 		GPIO_Write(5,PORTA,GPIO_LOW);
         vTaskDelay(pdMS_TO_TICKS(1000));
     }
-}*/
+}
 
 
 int main(void)
@@ -104,10 +100,10 @@ int main(void)
 	GPIO_Init(1,PORTA,&uart4_rx);
 
 Uart_Init();
- 	/*xTaskCreate(blink_task, "blink", 128, NULL, 1, NULL);
+ 	xTaskCreate(blink_task, "blink", 128, NULL, 1, NULL);
  	xTaskCreate(blink_task1, "blink1", 128, NULL, 1, NULL);
     vTaskStartScheduler();
-    for(;;);  // should never reach here*/
+    for(;;);  // should never reach here
 uint8_t c;
 	while(1)
 	{
@@ -126,11 +122,6 @@ if(Uart_Rx(&c))
 		GPIO_Write(5,PORTA,GPIO_LOW);
 	}//	delay_ms(500);
 }
-/*	if(Uart_Rx() == 0x55)
-		GPIO_Write(5,PORTA,GPIO_HIGH);
-		//delay_ms(10000);
-	else if(Uart_Rx() == 0x56)
-		GPIO_Write(5,PORTA,GPIO_LOW);
-		//delay_ms(10000);*/
+
 	}
 }
