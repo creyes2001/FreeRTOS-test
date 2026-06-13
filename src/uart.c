@@ -1,4 +1,6 @@
 #include "buffer.h"
+#include "FreeRTOS.h"
+#include "task.h"
 #include "uart.h"
 
 static buffer_t tx_buffer;
@@ -25,10 +27,16 @@ void Uart_Init(void){
 }
 
 void Uart_InterruptHandler(void){
+	
+	UBaseType_t status;
+
 	//tx handling
 	if ((UART4->SR & (1U << 7)) && (UART4->CR1 & (1U <<7))) { 
 		uint8_t c;
-		if(Buffer_Get(&tx_buffer,&c))
+		status = taskENTER_CRITICAL_FROM_ISR();
+		bool has = Buffer_Get(&tx_buffer,&c); 
+		taskEXIT_CRITICAL_FROM_ISR(status);
+		if(has)
 		{
 			UART4->DR = c;
 		}
@@ -39,17 +47,26 @@ void Uart_InterruptHandler(void){
 
 	//rx handling
 	if(UART4->SR & (1U << 5)){
-		uint8_t c;
-		c = UART4->DR;
-		Buffer_Add(&rx_buffer,c);
+		uint8_t c = UART4->DR;
+		status = taskENTER_CRITICAL_FROM_ISR();
+		(void)Buffer_Add(&rx_buffer,c);
+		taskEXIT_CRITICAL_FROM_ISR(status);
 	}
 }
 
 void Uart_Tx(uint8_t data){
-	(void)Buffer_Add(&tx_buffer,data);
+	bool ok;
+	taskENTER_CRITICAL();
+	ok = Buffer_Add(&tx_buffer,data);
+	taskEXIT_CRITICAL();
+	(void)ok;
  	UART4->CR1 |= (1U << 7); //TXEIE enabled
 }
 
 bool Uart_Rx(uint8_t *data){
-	return Buffer_Get(&rx_buffer,data);
+	bool ok;
+	taskENTER_CRITICAL();
+	ok = Buffer_Get(&rx_buffer,data);
+	taskEXIT_CRITICAL();
+	return ok;
 }

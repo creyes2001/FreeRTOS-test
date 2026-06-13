@@ -9,25 +9,11 @@ void SystemInit(void) {}
 
 volatile uint32_t ms_ticks = 0;
 
-void SysTick_Handler(void) {
-    ms_ticks++;
-}
-
-void systick_init(void) {
-    SysTick->LOAD = (180000000 / 1000) - 1;  // 1 ms at 180 MHz
-    SysTick->VAL  = 0;
-    SysTick->CTRL = (1 << 0) | (1 << 1) | (1 << 2);  // enable, interrupt, use processor clock
-}
-
-void delay_ms(uint32_t ms) {
-    uint32_t start = ms_ticks;
-    while ((ms_ticks - start) < ms);
-}
-
 void UART4_IRQHandler(void)
 {
 	Uart_InterruptHandler();
 }
+
 void vApplicationStackOverflowHook(TaskHandle_t xTask, char *pcTaskName)
 {
     (void)xTask; (void)pcTaskName;
@@ -87,7 +73,6 @@ void blink_task1(void *p) {
 int main(void)
 {
 	SysClk_Config();
- 	systick_init();
 	
 	RCC->AHB1ENR |= (1 << 0);   // GPIOAEN
 	(void)RCC->AHB1ENR;			// dummy read
@@ -99,9 +84,10 @@ int main(void)
 	GPIO_Init(0,PORTA,&uart4_tx);
 	GPIO_Init(1,PORTA,&uart4_rx);
 
-Uart_Init();
- 	xTaskCreate(blink_task, "blink", 128, NULL, 1, NULL);
- 	xTaskCreate(blink_task1, "blink1", 128, NULL, 1, NULL);
+	Uart_Init();
+ 	
+	xTaskCreate(blink_task, "blink", 128, NULL, 1, NULL);
+	xTaskCreate(blink_task1, "blink1", 128, NULL, 1, NULL);
     vTaskStartScheduler();
     for(;;);  // should never reach here
 uint8_t c;
@@ -115,12 +101,11 @@ if(Uart_Rx(&c))
 	if(c==0x56)
 	{
 		GPIO_Write(5,PORTA,GPIO_HIGH);
-	//	delay_ms(500);
 		
 	}
 	else{
 		GPIO_Write(5,PORTA,GPIO_LOW);
-	}//	delay_ms(500);
+	}
 }
 
 	}
