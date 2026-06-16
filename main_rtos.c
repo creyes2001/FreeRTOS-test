@@ -54,7 +54,7 @@ gpio_config_t uart4_rx = {
 void uart_test_task(void *p){
 	
 	for(;;){
-		Uart_Tx('X');
+		Uart_Tx('A');
     	vTaskDelay(pdMS_TO_TICKS(10));   // give the ISR time to TX + RX
     	uint8_t rx;
     	if (Uart_Rx(&rx)) {

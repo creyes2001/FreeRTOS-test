@@ -26,26 +26,29 @@ SIZE = arm-none-eabi-size
 #=====================Files======================================
 TARGET  = FreeTest
 
-SOURCES = main.c\
-		  src/gpio.c\
+SOURCES = src/gpio.c\
 		  src/clock.c\
 		  src/uart.c\
-		  src/buffer.c\
-		  $(FREERTOS_DIR)/tasks.c \
-		  $(FREERTOS_DIR)/queue.c \
-		  $(FREERTOS_DIR)/list.c \
-		  $(FREERTOS_DIR)/timers.c \
-		  $(FREERTOS_DIR)/event_groups.c \
-		  $(FREERTOS_PORT)/port.c \
-		  $(FREERTOS_HEAP)/heap_4.c
+		  src/buffer.c
+		  
+FREERTOS_SRCS = $(FREERTOS_DIR)/tasks.c \
+				$(FREERTOS_DIR)/queue.c \
+				$(FREERTOS_DIR)/list.c \
+				$(FREERTOS_DIR)/timers.c \
+				$(FREERTOS_DIR)/event_groups.c \
+				$(FREERTOS_PORT)/port.c \
+				$(FREERTOS_HEAP)/heap_4.c
 
 ASM_SRCS = $(STM_STARTUP_DIR)/startup_stm32f446xx.s
 
 
 RTOS ?= 1
 ifeq ($(RTOS),1)
+	SOURCES += main_rtos.c 
+	SOURCES += FREERTOS_SRCS
 	CFLAGS += -DUSE_FREERTOS
-
+else
+	SOURCES += main_baremetal.c
 endif
 
 vpath %.c . \
