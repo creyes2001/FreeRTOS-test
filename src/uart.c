@@ -1,7 +1,6 @@
 #include "buffer.h"
-#include "FreeRTOS.h"
-#include "task.h"
 #include "uart.h"
+#include "os_port.h"
 
 static buffer_t tx_buffer;
 static buffer_t rx_buffer;
@@ -18,6 +17,7 @@ void Uart_Init(void){
 	UART4->CR1 |= (1U << 2); //Receiver enable (RE)
 	UART4->CR1 |= (1U << 13); //Uart peripherial enable (UE)
 
+	NVIC_SetPriority(UART4_IRQn, 6);
 	NVIC_EnableIRQ(UART4_IRQn);
 	UART4->CR1 |= (1U << 7); //TXEIE enabled
 	UART4->CR1 |= (1U << 5); //RXEIE enabled
@@ -27,15 +27,15 @@ void Uart_Init(void){
 }
 
 void Uart_InterruptHandler(void){
-	
-	UBaseType_t status;
+
+	OS_ISR_STATUS_T status; 
 
 	//tx handling
 	if ((UART4->SR & (1U << 7)) && (UART4->CR1 & (1U <<7))) { 
 		uint8_t c;
-		status = taskENTER_CRITICAL_FROM_ISR();
+		OS_ENTER_CRITICAL_ISR(status);
 		bool has = Buffer_Get(&tx_buffer,&c); 
-		taskEXIT_CRITICAL_FROM_ISR(status);
+		OS_EXIT_CRITICAL_ISR(status);
 		if(has)
 		{
 			UART4->DR = c;
@@ -48,25 +48,25 @@ void Uart_InterruptHandler(void){
 	//rx handling
 	if(UART4->SR & (1U << 5)){
 		uint8_t c = UART4->DR;
-		status = taskENTER_CRITICAL_FROM_ISR();
+		OS_ENTER_CRITICAL_ISR(status);
 		(void)Buffer_Add(&rx_buffer,c);
-		taskEXIT_CRITICAL_FROM_ISR(status);
+		OS_EXIT_CRITICAL_ISR(status);
 	}
 }
 
 void Uart_Tx(uint8_t data){
 	bool ok;
-	taskENTER_CRITICAL();
+	OS_ENTER_CRITICAL();
 	ok = Buffer_Add(&tx_buffer,data);
-	taskEXIT_CRITICAL();
+	OS_EXIT_CRITICAL();
 	(void)ok;
  	UART4->CR1 |= (1U << 7); //TXEIE enabled
 }
 
 bool Uart_Rx(uint8_t *data){
 	bool ok;
-	taskENTER_CRITICAL();
+	OS_ENTER_CRITICAL();
 	ok = Buffer_Get(&rx_buffer,data);
-	taskEXIT_CRITICAL();
+	OS_EXIT_CRITICAL();
 	return ok;
 }

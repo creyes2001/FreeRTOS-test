@@ -42,6 +42,12 @@ SOURCES = main.c\
 ASM_SRCS = $(STM_STARTUP_DIR)/startup_stm32f446xx.s
 
 
+RTOS ?= 1
+ifeq ($(RTOS),1)
+	CFLAGS += -DUSE_FREERTOS
+
+endif
+
 vpath %.c . \
           src \
           $(FREERTOS_DIR) \

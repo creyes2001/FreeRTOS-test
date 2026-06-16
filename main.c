@@ -51,6 +51,20 @@ gpio_config_t uart4_rx = {
 	.alt_func = AF8
 };
 
+void uart_test_task(void *p){
+	
+	for(;;){
+		Uart_Tx('X');
+    	vTaskDelay(pdMS_TO_TICKS(10));   // give the ISR time to TX + RX
+    	uint8_t rx;
+    	if (Uart_Rx(&rx)) {
+        	// success path — toggle LED if rx == 'X'
+        	if (rx == 'X') GPIO_Write(5, PORTA, GPIO_HIGH);
+    	}
+    	vTaskDelay(pdMS_TO_TICKS(1000));
+	}
+}
+
 void blink_task(void *p) {
     for(;;) {
 		GPIO_Write(5,PORTA,GPIO_HIGH);
@@ -86,27 +100,10 @@ int main(void)
 
 	Uart_Init();
  	
-	xTaskCreate(blink_task, "blink", 128, NULL, 1, NULL);
-	xTaskCreate(blink_task1, "blink1", 128, NULL, 1, NULL);
+//	xTaskCreate(blink_task, "blink", 128, NULL, 1, NULL);
+//	xTaskCreate(blink_task1, "blink1", 128, NULL, 1, NULL);
+	xTaskCreate(uart_test_task, "uarttx", 256, NULL, 1, NULL);
     vTaskStartScheduler();
     for(;;);  // should never reach here
-uint8_t c;
-	while(1)
-	{
-		
-		Uart_Tx(0x56);
 
-if(Uart_Rx(&c))
-{
-	if(c==0x56)
-	{
-		GPIO_Write(5,PORTA,GPIO_HIGH);
-		
-	}
-	else{
-		GPIO_Write(5,PORTA,GPIO_LOW);
-	}
-}
-
-	}
 }
