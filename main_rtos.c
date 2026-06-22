@@ -87,12 +87,15 @@ void uart_task(void *p){
 		{
 			if(c == '\n' || c =='\r')
 			{
+				buff[idx] = '\0';
+				Uart_Tx(buff[idx]);
 				parse_and_dispatch(&buff);
 				idx = 0;
 			}
-			else
+			else if(idx < sizeof(buff)-1)
 			{
 				buff[idx] = c;
+				Uart_Tx(buff[idx]);
 				idx++;
 			}
 		}
@@ -100,6 +103,7 @@ void uart_task(void *p){
 		{
        		vTaskDelay(pdMS_TO_TICKS(5));
 		}
+		
 	}
 }
 
@@ -107,14 +111,14 @@ void blink_task(void *p) {
     uint32_t rate = 1000;
 	uint32_t new_rate;
 	for(;;) {
-		GPIO_Write(2,PORTA,GPIO_HIGH);
-        if(xTaskNotifyWait(0,0,&new_rate,pdMS_TO_TICKS(rate) == pdTRUE))
+		GPIO_Write(5,PORTA,GPIO_HIGH);
+        if(xTaskNotifyWait(0,0,&new_rate,pdMS_TO_TICKS(rate)) == pdTRUE)
 		{
 			rate = new_rate;
 		}
 				
-		GPIO_Write(2,PORTA,GPIO_LOW);
-        if(xTaskNotifyWait(0,0,&new_rate,pdMS_TO_TICKS(rate) == pdTRUE))
+		GPIO_Write(5,PORTA,GPIO_LOW);
+        if(xTaskNotifyWait(0,0,&new_rate,pdMS_TO_TICKS(rate)) == pdTRUE)
 		{
 			rate = new_rate;
 		}
@@ -122,11 +126,20 @@ void blink_task(void *p) {
 }
 
 void blink_task1(void *p) {
-    for(;;) {
-		GPIO_Write(5,PORTA,GPIO_HIGH);
-        vTaskDelay(pdMS_TO_TICKS(1000));
-		GPIO_Write(5,PORTA,GPIO_LOW);
-        vTaskDelay(pdMS_TO_TICKS(1000));
+    uint32_t rate = 1000;
+	uint32_t new_rate;
+	for(;;) {
+		GPIO_Write(4,PORTA,GPIO_HIGH);
+        if(xTaskNotifyWait(0,0,&new_rate,pdMS_TO_TICKS(rate)) == pdTRUE)
+		{
+			rate = new_rate;
+		}
+				
+		GPIO_Write(4,PORTA,GPIO_LOW);
+        if(xTaskNotifyWait(0,0,&new_rate,pdMS_TO_TICKS(rate)) == pdTRUE)
+		{
+			rate = new_rate;
+		}
     }
 }
 
@@ -143,13 +156,13 @@ int main(void)
 
 	GPIO_Init(0,PORTA,&uart4_tx);
 	GPIO_Init(1,PORTA,&uart4_rx);
-	GPIO_Init(2,PORTA,&led2);
+	GPIO_Init(4,PORTA,&led2);
 	GPIO_Init(5,PORTA,&led);
 	
 	Uart_Init();
  	
-	xTaskCreate(blink_task, "led1_task", 128, NULL, 1, led1_handle);
-	xTaskCreate(blink_task1, "led2_task", 128, NULL, 1, led2_handle);
+	xTaskCreate(blink_task, "led1_task", 256, NULL, 1, &led1_handle);
+	xTaskCreate(blink_task1, "led2_task", 256, NULL, 1, &led2_handle);
 	xTaskCreate(uart_task, "uarttx", 256, NULL, 1, NULL);
     vTaskStartScheduler();
     for(;;);  // should never reach here
