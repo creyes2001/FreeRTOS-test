@@ -45,7 +45,7 @@ ASM_SRCS = $(STM_STARTUP_DIR)/startup_stm32f446xx.s
 RTOS ?= 1
 ifeq ($(RTOS),1)
 	SOURCES += main_rtos.c 
-	SOURCES += FREERTOS_SRCS
+	SOURCES += $(FREERTOS_SRCS)
 	CFLAGS += -DUSE_FREERTOS
 else
 	SOURCES += main_baremetal.c
