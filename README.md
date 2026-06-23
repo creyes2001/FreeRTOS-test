@@ -1,10 +1,7 @@
-# FreeTest — STM32F446RE Bare-metal HAL + FreeRTOS
+# FreeTest — STM32F446RE UART-Controlled LEDs
 
-Bare-metal firmware project for the **STM32F446RE Nucleo-64** board, built entirely in C without an IDE.
-The goal is to build a clean, layered HAL from scratch while integrating FreeRTOS, mimicking the
-architectural discipline expected in professional embedded software development.
+An **STM32F446RE** project that controls two LEDs' blink rate via UART commands. It uses custom register-level drivers (GPIO HAL, interrupt-driven UART) and FreeRTOS, with the UART driver supporting both bare-metal and RTOS builds.
 
-> **Status:** Active development — UART4 interrupt-driven TX/RX complete, next step: FreeRTOS integration.
 
 ---
 
@@ -18,6 +15,21 @@ architectural discipline expected in professional embedded software development.
 | SYSCLK | 180 MHz via PLL (PLLM=8, PLLN=360, PLLP=2) |
 | PCLK1 (APB1) | 45 MHz |
 | PCLK2 (APB2) | 90 MHz |
+
+### UART4 Wiring
+
+| Nucleo Pin | Function | Connect to |
+|---|---|---|
+| PA0 | UART4_TX | adapter RX |
+| PA1 | UART4_RX | adapter TX |
+| GND | — | adapter GND |
+
+### LEDs
+
+| Pin | LED |
+|---|---|
+| PA5 | LED1 (onboard LD2) |
+| PA4 | LED2 (external) |
 
 ---
 ## Toolchain
@@ -84,54 +96,34 @@ Once UART4 RX is complete, the project transitions to FreeRTOS integration:
 
 ---
 
-## Key Bugs Resolved
+## Build
 
-These are documented because the debugging process is part of the learning:
+The project supports both bare-metal and FreeRTOS builds, selected by the `make` target:
 
-| Bug | Root Cause | Fix |
-|---|---|---|
-| GPIO MODER misconfiguration | Used `2^pin` (XOR) instead of `pin * 2` (left shift) | Corrected bit shift in MODER write macro |
-| HSE clock not starting | Nucleo uses ST-Link oscillator — requires HSE bypass mode, not crystal mode | Enabled `RCC_CR_HSEBYP` before `HSEON` |
-| 180 MHz PLL unstable | Over-Drive mode not enabled; F446 requires it above 168 MHz | Added PWR Over-Drive enable + wait sequence |
-| UART4 wrong baud rate | BRR calculated using SYSCLK (180 MHz) instead of PCLK1 (45 MHz) | Fixed BRR formula to use correct APB1 clock |
+- `make` — build the FreeRTOS version
+- `make RTOS=0` — build the bare-metal version
 
----
+To build and flash:
 
-## Build & Flash
+- `make flash` — flash the FreeRTOS version
+- `make RTOS=0 flash` — flash the bare-metal version
 
-```bash
-# Build
-make
+Both options exist because the UART driver supports both build types, and the target context must be specified at compile time. The same mechanism will apply to future drivers that support both builds.
 
-# Flash via OpenOCD
-make flash
-
-# Debug session
-make debug
-```
-
-> OpenOCD config: `board/st_nucleo_f4.cfg`
 
 ---
 
-## Goals / Roadmap
+## Usage
 
-- [x] PLL clock tree to 180 MHz
-- [x] GPIO HAL with alternate function support
-- [x] UART4 TX at 115200 baud
-- [x] Interrupt-driven UART4 TX with ring buffer
-- [x] UART4 RX with interrupt handling
-- [ ] FreeRTOS integration (ARM_CM4F port)
+Open a serial terminal at 115200 baud and send a command in one of these formats:
 
----
+- `A<rate>` — set LED1's blink rate
+- `B<rate>` — set LED2's blink rate
 
-## Why This Project Exists
+`<rate>` is the blink period in milliseconds. Press Enter to apply the new rate.
 
-This is a deliberate portfolio project to build the skills required for **automotive embedded software** roles.
-The architecture follows the layered approach (HAL → Driver → Application) common in AUTOSAR Classic environments,
-implemented from scratch to understand the fundamentals before working with generated code and BSW stacks.
-
-Every driver is written bare-metal against the RM0390 reference manual — no STM32 HAL library, no CubeMX.
+**Example:** `A500` sets LED1 to blink every 500 ms.
+**Example:** `B300` sets LED2 to blink every 300 ms.
 
 ---
 
